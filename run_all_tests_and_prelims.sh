@@ -16,7 +16,7 @@ wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s write-list.lua $VAULT_ADDR 
 # Run read test in background
 # Make sure that the secrets already exist in Vault before running this test
 # You can use write-secrets.lua (after some modification) to populate them
-nohup wrk -t4 -c16 -d$DURATION -H "X-Vault-Token: $VAULT_TOKEN" -s read-secrets-modified.lua $VAULT_ADDR -- 1000 false > $TIME/prod-test-read-1000-random-secrets-t4-c16-6hours.log &
+nohup wrk -t4 -c16 -d$DURATION -H "X-Vault-Token: $VAULT_TOKEN" -s read-secrets.lua $VAULT_ADDR -- 1000 false > $TIME/prod-test-read-1000-random-secrets-t4-c16-6hours.log &
 
 # Run list test in background
 # Make sure that the secrets already exist in Vault before running this test
