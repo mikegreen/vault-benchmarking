@@ -1,8 +1,5 @@
--- Script that reads secrets from k/v engine in Vault
--- To indicate the number of secrets you want to read, add "-- <N>" after the URL
--- If you want to print secrets read, add "-- <N> true" after the URL
-
-json = require "json"
+-- Script that writes secrets to pki engine in Vault
+-- Indicate number of secrets to write to pki/example_pki path with "-- <N>"
 
 local counter = 1
 local threads = {}
@@ -20,47 +17,39 @@ function init(args)
       num_secrets = tonumber(args[1])
    end
    print("Number of secrets is: " .. num_secrets)
-   if args[2] == nil then
-      print_secrets = "false"
-   else
-      print_secrets = args[2]
-   end
    requests  = 0
-   reads = 0
    responses = 0
-   method = "GET"
+   method = "POST"
+   path = "/v1/pki/issue/example_pki"
    body = ''
-   -- give each thread different random seed
-   math.randomseed(os.time() + id*1000)
-   local msg = "thread %d created with print_secrets set to %s"
-   print(msg:format(id, print_secrets))
+   local msg = "thread %d created"
+   print(msg:format(id))
 end
 
 function request()
-   reads = reads + 1
-   -- randomize path to secret
-   -- if num_secrets is not provided, it defaults above to 1000 which
-   -- will result in 404's if you do not have at least 1000 secrets
-   -- loaded at the secret/read-test/ path
-   path = "/v1/secret/read-test/secret-" .. math.random(num_secrets)
+   -- First request is not actually invoked
+   -- So, don't process it in order to get secret-1 as first secret
+   if requests > 0 then
+      print("starting request")
+      path = "/v1/pki/issue/example_pki"
+      body = '{"common_name": "www.examplepki.com", "ttl":"72h"  }'
+   end
    requests = requests + 1
    return wrk.format(method, path, nil, body)
 end
 
 function response(status, headers, body)
-   responses = responses + 1
-   if print_secrets == "true" then
-      body_object = json.decode(body)
-      for k,v in pairs(body_object) do 
-         if k == "data" then
-            print("Secret path: " .. path)
-            for k1,v1 in pairs(v) do
-               local msg = "read secrets: %s : %s"
-               print(msg:format(k1, v1)) 
-            end
-         end
-      end
-   end 
+	responses = responses + 1
+	if status ~= 200 then
+		print(headers)
+		print(body)
+		print(status)
+	end
+	print("starting response " .. responses)
+	if responses == num_secrets then
+		-- print("done, now summarize results")
+		os.exit()
+	end
 end
 
 done = function(summary, latency, requests)
