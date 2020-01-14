@@ -14,7 +14,10 @@ We also have the following utility scripts used to populate or delete secrets us
 1. [write-secrets.lua](./write-secrets.lua): This script writes secrets meant to be read by the read-secrets.lua script. It writes a fixed number of secrets (default 1,000) and then stops. Each secret has one key with 10-20 bytes and a second key with 100 bytes.  The number of secrets written can be changed by adding "-- \<N\>" after the URL where \<N\> is the number of secrets you want to write. The number and size of the keys could also be changed, but you would need to edit the script.
 1. [write-list.lua](./write-list.lua): This script writes a list of secrets each having one key with 10 bytes to the path secret/list-test. These secrets are read by the list-secrets.lua script. By default it writes 100 secrets, but you can change this by adding "-- \<N\>" after the URL where \<N\> is the number of secrets you want to write.
 1. [delete-secrets.lua](./delete-secrets.lua): This deletes a sequence of secrets from under a specified path. Pass the path from which you want to delete secrets by adding something like "-- secret/read-test" after the Vault URL. Do not start your path with "/v1/" or add a final "/" at the end of it since the script does this for you. The default path is "secret/test".
-1. [write-pki.lua](./write-pki.lua): This issues PKI certificates at the /pki/example_pki path. This is a work in progress. 
+1. [write-pki.lua](./write-pki.lua): This issues PKI certificates at the /pki/example_pki path.  This is not included in the [run_all_tests_and_prelims.sh](./run_all_tests_and_prelims.sh) script currently. To run:
+    ```
+    $ wrk -t2 -c2 -d10m -H "X-Vault-Token: $VAULT_TOKEN" -s write-pki.lua $VAULT_ADDR
+    ```
 
 Finally, [json.lua](./json.lua) is used by some of the other scripts to decode the JSON responses from the Vault HTTP API.
 
@@ -42,7 +45,8 @@ Success! Enabled the kv secrets engine at: secret/
 ```
 
 ## Setting up PKI
-Enable the PKI secrets engine (see full PKI docs [here](https://www.vaultproject.io/docs/secrets/pki/index.html)).
+To run the [write-pki.lua](./write-pki.lua) script to issue PKI certificates you need to setup a few things first. 
+This enables the PKI engine, sets the max lease to a year (from 30d default), and creates a role example_pki that allows any name certificate to be created. For further reading see PKI docs [here](https://www.vaultproject.io/docs/secrets/pki/index.html).
 
 ```
 $ vault secrets enable pki
@@ -53,8 +57,6 @@ Success! Tuned the secrets engine at: pki/
 
 $ vault write pki/roles/example_pki max_ttl=8760h allow_any_name=true
 Success! Data written to: pki/roles/example_pki
-
-$ 
 ```
 
 
