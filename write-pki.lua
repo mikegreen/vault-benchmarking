@@ -11,7 +11,7 @@ function setup(thread)
 end
 
 function init(args)
-   require(check_envvars)
+   require("check_envvars")
    check_envvars()
    if args[1] == nil then
       num_secrets = 50
