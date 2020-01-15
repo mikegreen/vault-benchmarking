@@ -10,9 +10,21 @@ function setup(thread)
    counter = counter + 1
 end
 
+function os.capture(cmd, raw)
+  local f = assert(io.popen(cmd, 'r'))
+  local s = assert(f:read('*a'))
+  f:close()
+  if raw then return s end
+  s = string.gsub(s, '^%s+', '')
+  s = string.gsub(s, '%s+$', '')
+  s = string.gsub(s, '[\n\r]+', ' ')
+  return s
+end
+
 function init(args)
-   require("check_envvars")
-   check_envvars()
+	require("check_envvars")
+	check_envvars()
+
    if args[1] == nil then
       num_secrets = 50
    else
@@ -47,13 +59,16 @@ function response(status, headers, body)
 	end
 	if responses == num_secrets then
 		-- print("done, now summarize results")
-		-- wrk.thread:stop()
 		os.exit()
 	end
 end
 
 done = function(summary, latency, requests)
-   io.write("\nJSON Output:\n")
+	require("check_audit")
+	audit_enabled = check_audit()
+--	print((audit_enabled))
+
+	io.write("\nJSON Output:\n")
    io.write("{\n")
    io.write(string.format("\t\"requests\": %d,\n", summary.requests))
    io.write(string.format("\t\"duration_in_microseconds\": %0.2f,\n", summary.duration))
