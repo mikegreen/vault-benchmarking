@@ -31,7 +31,7 @@ function init(args)
    else
       num_secrets = tonumber(args[1])
    end
-   print("Number of secrets is: " .. num_secrets)
+   print("Number of PKI certs to issue is: " .. num_secrets)
    requests  = 0
    responses = 0
    method = "POST"

@@ -13,6 +13,21 @@ function setup(thread)
 end
 
 function init(args)
+   -- check if $VAULT_TOKEN exists, if not exit
+   if isempty(os.getenv("VAULT_TOKEN")) then
+      print("VAULT_TOKEN not found, cannot continue..")
+      os.exit()
+   else
+      print("VAULT_TOKEN found")
+   end
+   -- check if $VAULT_ADDR exists, if not exit
+   if isempty(os.getenv("VAULT_ADDR")) then
+      print("VAULT_ADDR not found, cannot continue..")
+      os.exit()
+   else
+      print("VAULT_ADDR found")
+   end
+
    if args[1] == nil then
       print_secrets = "false"
    else
