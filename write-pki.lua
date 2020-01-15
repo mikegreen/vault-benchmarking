@@ -11,8 +11,23 @@ function setup(thread)
 end
 
 function init(args)
+	-- check if $VAULT_TOKEN exists, if not exit
+	if isempty(os.getenv("VAULT_TOKEN")) then
+		print("VAULT_TOKEN not found, cannot continue..")
+		os.exit()
+	else
+		print("VAULT_TOKEN found")
+	end
+	-- check if $VAULT_ADDR exists, if not exit
+	if isempty(os.getenv("VAULT_ADDR")) then
+		print("VAULT_ADDR not found, cannot continue..")
+		os.exit()
+	else
+		print("VAULT_ADDR found")
+	end
+
    if args[1] == nil then
-      num_secrets = 1000
+      num_secrets = 50
    else
       num_secrets = tonumber(args[1])
    end
@@ -23,31 +38,33 @@ function init(args)
    path = "/v1/pki/issue/example_pki"
    body = ''
    local msg = "thread %d created"
-   print(msg:format(id))
+   print(msg:format(id))	
+end
+
+function isempty(s)
+  return s == nil or s == ''
 end
 
 function request()
-   -- First request is not actually invoked
-   -- So, don't process it in order to get secret-1 as first secret
-   if requests > 0 then
-      print("starting request")
-      path = "/v1/pki/issue/example_pki"
-      body = '{"common_name": "www.examplepki.com", "ttl":"72h"  }'
-   end
-   requests = requests + 1
-   return wrk.format(method, path, nil, body)
+	-- print("starting request " .. requests)
+	path = "/v1/pki/issue/example_pki"
+	body = '{"common_name": "www.examplepki.com", "ttl":"72h"  }'
+	requests = requests + 1
+	return wrk.format(method, path, nil, body)
 end
 
 function response(status, headers, body)
 	responses = responses + 1
+	print("Thread " .. id .. " - starting response " .. responses)
+	-- if non-200 returned, print for debugging
 	if status ~= 200 then
 		print(headers)
 		print(body)
 		print(status)
 	end
-	print("starting response " .. responses)
 	if responses == num_secrets then
 		-- print("done, now summarize results")
+		-- wrk.thread:stop()
 		os.exit()
 	end
 end
