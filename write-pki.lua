@@ -69,7 +69,6 @@ end
 done = function(summary, latency, requests)
 	require("check_audit")
 	audit_enabled = check_audit()
---	print((audit_enabled))
 
 	io.write("\nJSON Output:\n")
    io.write("{\n")
