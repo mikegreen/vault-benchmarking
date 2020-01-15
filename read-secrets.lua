@@ -67,6 +67,8 @@ function response(status, headers, body)
 end
 
 done = function(summary, latency, requests)
+        require("check_audit")
+        audit_enabled = check_audit()
    io.write("\nJSON Output:\n")
    io.write("{\n")
    io.write(string.format("\t\"requests\": %d,\n", summary.requests))
