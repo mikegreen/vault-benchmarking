@@ -46,7 +46,7 @@ function isempty(s)
 end
 
 function request()
-	print("starting request " .. requests)
+	-- print("starting request " .. requests)
 	path = "/v1/pki/issue/example_pki"
 	body = '{"common_name": "www.examplepki.com", "ttl":"72h"  }'
 	requests = requests + 1
@@ -55,14 +55,16 @@ end
 
 function response(status, headers, body)
 	responses = responses + 1
+	print("Thread " .. id .. " - starting response " .. responses)
+	-- if non-200 returned, print for debugging
 	if status ~= 200 then
 		print(headers)
 		print(body)
 		print(status)
 	end
-	print("starting response " .. responses)
 	if responses == num_secrets then
 		-- print("done, now summarize results")
+		-- wrk.thread:stop()
 		os.exit()
 	end
 end
