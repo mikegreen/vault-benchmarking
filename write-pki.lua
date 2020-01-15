@@ -26,7 +26,7 @@ function init(args)
 	check_envvars()
 
    if args[1] == nil then
-      num_secrets = 50
+      num_secrets = 1000
    else
       num_secrets = tonumber(args[1])
    end
@@ -45,7 +45,9 @@ function request()
 	path = "/v1/pki/issue/example_pki"
 	body = '{"common_name": "www.examplepki.com", "ttl":"72h"  }'
 	requests = requests + 1
-	return wrk.format(method, path, nil, body)
+	while num_secrets > responses do
+		return wrk.format(method, path, nil, body)
+	end
 end
 
 function response(status, headers, body)
@@ -58,8 +60,9 @@ function response(status, headers, body)
 		print(status)
 	end
 	if responses == num_secrets then
-		-- print("done, now summarize results")
-		os.exit()
+		print("done, now summarize results")
+		-- wrk.thread:stop()
+		-- os.exit()
 	end
 end
 
