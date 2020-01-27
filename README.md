@@ -21,6 +21,14 @@ We also have the following utility scripts used to populate or delete secrets us
     ```
     $ wrk -t2 -c2 -d10m -H "X-Vault-Token: $VAULT_TOKEN" -s write-pki.lua $VAULT_ADDR
     ```
+1. [encrypt-transit.lua](./encrypt-transit.lua): Transit encryptions. Work in progress. To run:
+    ```
+    $ vault secrets enable -path=transitTest transit 
+    $ vault write -f transitTest/keys/my-key
+
+    Run for 1 minute (the number to the right is number of encrypts to try in the time period, 1m)
+    $ wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s encrypt-transit.lua $VAULT_ADDR/v1/transitTest/encrypt/test  -- 500000000
+    ```
 
 Finally, [json.lua](./json.lua) is used by some of the other scripts to decode the JSON responses from the Vault HTTP API.
 
