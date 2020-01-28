@@ -4,6 +4,8 @@ This repository contains some Lua scripts for running benchmarks against Vault w
 This repo was forked from [jdfriedma/vault-benchmarking](https://github.com/jdfriedma/vault-benchmarking), who forked from [rberlind/vault-benchmarking](https://github.com/rberlind/vault-benchmarking)
 I'm happy to add people to this one, and/or merge into the real HashiCorp org. It didn't appear Roger or Jacob were actively working on theirs. 
 
+You will first need to install wrk on your runner: https://github.com/wg/wrk/wiki/Installing-wrk-on-Linux
+
 
 ## Scripts
 The following are the main test scripts:
