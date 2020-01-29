@@ -13,6 +13,9 @@ wrk.headers["Content-Type"] = "application/json"
 local counter = 1
 local threads = {}
 
+-- print lots of info, this can slow down due to the verbosity of traffic
+printDebug = false
+
 function setup(thread)
    thread:set("id", counter)
    table.insert(threads, thread)
@@ -83,16 +86,20 @@ function request()
 	-- body = '{"plaintext":"YXZidnF2ZWd4aWNqeGFydG9kZGFtcm53ZGh3dHNx" }'
 	requests = requests + 1
 	while num_secrets > responses do
-		print(path)
-		print(wrk.headers)
-		print(body)
+    if printDebug then
+      print(path)
+      print(wrk.headers)
+      print(body)
+    end
 		return wrk.format(method, path, wrk.headers, body)
 	end
 end
 
 function response(status, headers, body)
 	responses = responses + 1
-	print("Thread " .. id .. " - starting response " .. responses)
+	if printDebug then
+    print("Thread " .. id .. " - starting response " .. responses)
+  end
 	-- if non-200 returned, print for debugging
 	if status ~= 200 then
 		print(headers)
