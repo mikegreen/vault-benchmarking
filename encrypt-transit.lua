@@ -106,7 +106,9 @@ function response(status, headers, body)
 		print(body)
 		print(status)
 	end
-		print(body)
+	if printDebug then
+  	print(body)
+  end
 	if responses == num_secrets then
 		print("done, now summarize results")
 		-- wrk.thread:stop()
