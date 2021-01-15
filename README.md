@@ -15,7 +15,7 @@ The following are the main test scripts:
 1. [write-delete-secrets.lua](./write-delete-secrets.lua): This script sequentially writes and deletes secrets. It must be run with one thread (`-t1`) and one connection (`-c1`) to ensure deletes do not reach the Vault server before the corresponding writes. However, multiple instances of this script can be run at the same time by passing an extra argument `-- <n>` after the URL, being sure to use a different value of \<n\> for each instance. Secrets for instance \<n\> of the script will be written in a sequential loop to the secret/write-delete-test path and will be named "test\<n\>-secret-\<x\>" where \<x\> is between 1 and N (default 100). This naming convention allows multiple instances of this script as well as other scripts to be run at the same time without conflict. By default, each secret has one key with 10-20 bytes and a second key with 100 bytes.  The number of distinct secrets, N, can be changed by adding an extra argument after the script identifier. In this case, you would add "-- \<identifier\> \<N\>" after the URL, using integers for both of these arguments. The number and size of the keys could be changed, but you would need to edit the script.  There is no need to pre-populate Vault with any data for this test. The last secret written might not be deleted if the final request is a write.  
 1. [list-secrets.lua](./list-secrets.lua): This script repeatedly lists all secrets on the path secret/list-test. Use the write-list.lua script to populate that path with secrets. By default, that script writes 100 secrets to that path with each secret having one key with 10 bytes. If you want to print the secrets found in each list, add "-- true" after the URL.
 1. [authenticate-and-revoke.lua](./authenticate-and-revoke.lua): This script repeatedly authenticates a user ("loadtester") against Vault's [userpass](https://www.vaultproject.io/docs/auth/userpass.html) authentication method and then revokes the acquired lease. (See below for instructions to enable it.)
-1. [write-pki.lua](./write-pki.lua): This issues PKI certificates at the /pki/example_pki path.  This is not included in the [run_all_tests_and_prelims.sh](./run_all_tests_and_prelims.sh) script currently. To run:
+1. [write-pki.lua](./write-pki.lua): This issues PKI certificates at the /pki/example_pki path.  See below for PKI setup steps. This is not included in the [run_all_tests_and_prelims.sh](./run_all_tests_and_prelims.sh) script currently. To run:
     ```
     $ wrk -t2 -c2 -d10m -H "X-Vault-Token: $VAULT_TOKEN" -s write-pki.lua $VAULT_ADDR
     ```
@@ -72,6 +72,9 @@ Success! Tuned the secrets engine at: pki/
 
 $ vault write pki/roles/example_pki max_ttl=8760h allow_any_name=true
 Success! Data written to: pki/roles/example_pki
+
+$ vault write pki/root/generate/internal common_name=my-website.com ttl=8760h
+(certification stuff returned)
 ```
 
 
