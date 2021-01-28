@@ -27,6 +27,10 @@ The following are the main test scripts:
     Run for 1 minute (the number to the right is number of encrypts to try in the time period, 1m)
     $ wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s encrypt-transit.lua $VAULT_ADDR/v1/transitTest/encrypt/test  -- 500000000
     ```
+    If you are running this on HCP Vault, you'll need the namespace specified:
+    ```
+    wrk -t4 -c8 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -H "X-Vault-Namespace: admin" -s encrypt-transit.lua $VAULT_ADDR/v1/transitTest/encrypt/test  -- 500000000
+    ```
 
 
 We also have the following utility scripts used to populate or delete secrets used by the test scripts:
