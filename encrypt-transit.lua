@@ -80,6 +80,8 @@ function init(args)
     num_secrets = tonumber(encrypts)
   end
   -- below will print for each thread 
+  local msg = "Thread %d created"
+  print(msg:format(id))  
   print("Number of transit requests to encrypt is: " .. num_secrets)
   print("Transit payload size is: " .. transitPayloadLength .. " characters")
 
@@ -95,14 +97,14 @@ function init(args)
       print("Debug is disabled")
       printDebug = false
     end
+  print("")
 
    requests  = 0
    responses = 0
    method = "POST"
    path = "/v1/transitTest/encrypt/test"
    body = ""
-   local msg = "thread %d created"
-   print(msg:format(id))	
+
 end
 
 function request()
