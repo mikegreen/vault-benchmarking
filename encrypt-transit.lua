@@ -13,7 +13,7 @@ wrk.headers["Content-Type"] = "application/json"
 
 local counter = 1
 local threads = {}
-local transitPayloadLength = 4096
+local transitPayloadLength = 1024
 
 function setup(thread)
    thread:set("id", counter)
