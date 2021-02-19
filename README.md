@@ -19,19 +19,22 @@ The following are the main test scripts:
     ```
     $ wrk -t2 -c2 -d10m -H "X-Vault-Token: $VAULT_TOKEN" -s write-pki.lua $VAULT_ADDR
     ```
-1. [encrypt-transit.lua](./encrypt-transit.lua): Transit encryptions. Work in progress. To run:
+1. [encrypt-transit.lua](./encrypt-transit.lua): Transit encryptions. This one is a little different syntax. To prepare, enable transit and create a transit key with the CLI below:
     ```
     $ vault secrets enable -path=transitTest transit 
-    $ vault write -f transitTest/keys/my-key
+    $ vault write -f transitTest/keys/my-key 
 
-    Run for 1 minute (the number to the right is number of encrypts to try in the time period, 1m)
-    $ wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s encrypt-transit.lua $VAULT_ADDR/v1/transitTest/encrypt/test  -- 500000000
+    Run for 1 minute, max of 500000 operations
+    $ wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s encrypt-transit.lua $VAULT_ADDR/v1/transitTest/encrypt/test encrypts=500000 
     ```
-    If you are running this on HCP Vault, you'll need the namespace specified:
+    If you are running this on HCP Vault, you'll need the namespace specified (defaults to admin):
     ```
-    wrk -t4 -c8 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -H "X-Vault-Namespace: admin" -s encrypt-transit.lua $VAULT_ADDR/v1/transitTest/encrypt/test  -- 500000000
+    $ wrk -t4 -c8 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -H "X-Vault-Namespace: admin" -s encrypt-transit.lua $VAULT_ADDR/v1/transitTest/encrypt/test encrypts=500000000
+    
+    Note: debug output can be enabled with debug=true after encrypts, ie:
+    $ wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s encrypt-transit.lua $VAULT_ADDR/v1/transitTest/encrypt/test encrypts=500000 debug=true
+    
     ```
-
 
 We also have the following utility scripts used to populate or delete secrets used by the test scripts:
 1. [write-secrets.lua](./write-secrets.lua): This script writes secrets meant to be read by the read-secrets.lua script. It writes a fixed number of secrets (default 1,000) and then stops. Each secret has one key with 10-20 bytes and a second key with 100 bytes.  The number of secrets written can be changed by adding "-- \<N\>" after the URL where \<N\> is the number of secrets you want to write. The number and size of the keys could also be changed, but you would need to edit the script.
