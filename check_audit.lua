@@ -1,3 +1,6 @@
+-- This function checks if audit is enabled, as that is a big driver in performance
+-- It won't work for HCP Vault, as we dont have access to sys/audit, but, we know
+--   HCP vault has auditing enabled anyways :-) 
 function check_audit()
         local file = assert(io.popen('vault audit list', 'r'))
         local audit_output = file:read('*all')

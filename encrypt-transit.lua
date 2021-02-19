@@ -13,10 +13,7 @@ wrk.headers["Content-Type"] = "application/json"
 
 local counter = 1
 local threads = {}
-local transitPayloadLength = 255
-
--- print lots of info, this can slow down due to the verbosity of traffic
-printDebug = false
+local transitPayloadLength = 4096
 
 function setup(thread)
    thread:set("id", counter)
@@ -66,14 +63,38 @@ function init(args)
 	require("check_envvars")
 	check_envvars()
 
-   if args[1] == nil then
-      num_secrets = 1000
-   else
-      num_secrets = tonumber(args[1])
-   end
-   -- below will print for each thread 
-   print("Number of transit requests to encrypt is: " .. num_secrets)
-   print("Transit payload size is: " .. transitPayloadLength .. " characters")
+  -- check if number of encrypts was passed as argument 1 
+  fieldName, encrypts = args[1]:match("([^,]+)=([^,]+)")
+  -- if we can't figure out argument 1 is in encrypts=5000 format, assume it might just be a number 
+  if fieldName == nil then
+    print(args[1])
+    encrypts = tonumber(args[1])
+  elseif not string.match(fieldName, "encrypts") then
+    print("encrypts value should be provided as 2nd to last argument (last argument is debug=true/false)")
+  end
+
+  -- if no arguments passed at end, just run for 1000 
+  if args[1] == nil then
+    num_secrets = 1000
+  else
+    num_secrets = tonumber(encrypts)
+  end
+  -- below will print for each thread 
+  print("Number of transit requests to encrypt is: " .. num_secrets)
+  print("Transit payload size is: " .. transitPayloadLength .. " characters")
+
+  -- check if debug is enabled, if passed as argument 2
+  -- print lots of info, this can slow down due to the verbosity of traffic
+  if args[2] == nil then
+      print("Debug is disabled. To enable, after encrypts argument, add debug=true")
+      printDebug = false
+    elseif string.match(args[2],"debug=true") then
+      print("Debug is enabled")
+      printDebug = true 
+    else
+      print("Debug is disabled")
+      printDebug = false
+    end
 
    requests  = 0
    responses = 0
